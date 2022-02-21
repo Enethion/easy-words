@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { WordType } from 'src/app/data/models';
 import { WordsService } from 'src/app/services/words.service';
 
@@ -7,14 +8,23 @@ import { WordsService } from 'src/app/services/words.service';
   templateUrl: './question.component.html',
   styleUrls: ['./question.component.css']
 })
-export class QuestionComponent implements OnInit {
+export class QuestionComponent implements OnInit, OnDestroy {
 
-  word: WordType = null;
+  word: WordType = null
+  private words = []
+  private subscription: Subscription
 
-  constructor(private wordsService: WordsService) { }
+  constructor(private wordsService: WordsService){ }
 
   ngOnInit(): void {
-    this.fetchWord()
+    this.subscription = this.wordsService.getWords().subscribe((words: WordType[]) => {
+      this.words = words
+      this.fetchWord()
+    })
+  }
+
+  ngOnDestroy(): void {
+      this.subscription.unsubscribe()
   }
 
   addToNouns(): void {
@@ -27,12 +37,8 @@ export class QuestionComponent implements OnInit {
     this.fetchWord()
   }
 
-  check() {
-    this.wordsService.check()
-  }
-
   private fetchWord(): void {
-    this.word = this.wordsService.getWords().shift()
+    this.word = this.words.shift()
   }
 
 }

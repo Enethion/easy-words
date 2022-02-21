@@ -7,8 +7,12 @@ import { WordType } from 'src/app/data/models';
   styleUrls: ['./answers.component.css']
 })
 export class AnswersComponent implements OnInit {
-  
-  @Input() words: WordType[]
+  words: WordType[] = []
+  @Input() set word(word: WordType){
+    if (word) {
+      this.words.push(word)
+    }
+  }
 
   constructor() { }
 
